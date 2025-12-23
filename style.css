@@ -1,0 +1,161 @@
+/* --- RESET & BASE --- */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background: #000;
+    font-family: 'Montserrat', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* --- BACKGROUNDS (REALISTIC) --- */
+.bg-image {
+    position: absolute; inset: 0; z-index: -3;
+    /* Gambar Malam Berbintang High Res */
+    background-image: url('https://images.unsplash.com/photo-1519681393784-d8e5b5a4570e?q=80&w=2070&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    transition: filter 2s ease, transform 10s linear;
+}
+
+.bg-overlay {
+    position: absolute; inset: 0; z-index: -2;
+    background: rgba(0, 0, 0, 0.6); /* Gelap 60% */
+}
+
+.vignette {
+    position: absolute; inset: 0; z-index: -1;
+    background: radial-gradient(circle, transparent 40%, black 100%);
+}
+
+.flash-layer {
+    position: absolute; inset: 0; background: red; z-index: 50;
+    opacity: 0; pointer-events: none; transition: opacity 0.1s;
+}
+
+/* --- UI COMPONENTS --- */
+.game-container {
+    width: 90%; max-width: 600px;
+    position: relative; z-index: 10;
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; min-height: 60vh;
+}
+
+/* Start Screen */
+.center-box { text-align: center; }
+.title-anim { font-family: 'Cinzel', serif; font-size: 3rem; margin-bottom: 10px; animation: fadeInDown 1.5s ease; }
+.subtitle-anim { font-size: 1rem; color: #ccc; margin-bottom: 30px; animation: fadeInUp 1.5s ease; }
+.btn-start {
+    background: white; color: black; border: none; padding: 15px 40px;
+    font-family: 'Cinzel', serif; font-weight: bold; cursor: pointer;
+    transition: 0.3s; letter-spacing: 2px;
+}
+.btn-start:hover { transform: scale(1.1); box-shadow: 0 0 20px white; }
+
+/* Narrative (Kuning) */
+.narrative-wrapper {
+    margin-bottom: 40px; text-align: center;
+    animation: fadeIn 1s ease;
+}
+.narrative-font {
+    color: #fcd34d; font-style: italic; font-size: 1.3rem;
+    text-shadow: 0 0 10px rgba(253, 211, 77, 0.3);
+    line-height: 1.6;
+}
+
+/* Dialogue (NPC) */
+.dialogue-wrapper {
+    background: rgba(20, 20, 20, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 30px; border-radius: 4px;
+    width: 100%; position: relative;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    margin-bottom: 20px;
+    animation: slideUp 0.8s ease;
+}
+.char-name {
+    position: absolute; top: -15px; left: 20px;
+    background: white; color: black; padding: 5px 15px;
+    font-weight: bold; font-family: 'Cinzel', serif; font-size: 0.8rem;
+    letter-spacing: 1px;
+}
+.npc-font { font-size: 1.1rem; line-height: 1.7; display: inline; }
+.typing-cursor { animation: blink 0.8s infinite; font-weight: bold; color: white; }
+
+/* Interaction Area */
+.interaction-wrapper { width: 100%; animation: fadeIn 0.5s ease; }
+.choices-col { display: flex; flex-direction: column; gap: 15px; }
+
+.btn-choice {
+    background: transparent; border: 1px solid rgba(255,255,255,0.3);
+    color: #ddd; padding: 15px 20px; text-align: left;
+    font-family: 'Montserrat', sans-serif; cursor: pointer;
+    transition: 0.3s; position: relative; overflow: hidden;
+}
+.btn-choice:hover {
+    background: rgba(255,255,255,0.1); border-color: #fcd34d; color: #fcd34d; padding-left: 25px;
+}
+
+/* Input & Feedback */
+.input-row { display: flex; gap: 10px; }
+input {
+    flex: 1; background: transparent; border: none; border-bottom: 1px solid white;
+    color: white; padding: 10px; font-family: 'Montserrat', sans-serif; outline: none;
+}
+.btn-action {
+    background: white; color: black; border: none; padding: 10px 25px;
+    cursor: pointer; font-weight: bold; transition: 0.3s;
+}
+.btn-action:hover { background: #fcd34d; }
+
+.feedback-col { text-align: center; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 8px; }
+#feedback-text { color: #fcd34d; margin-bottom: 15px; font-style: italic; }
+
+/* Health Bar */
+.ui-layer { position: fixed; top: 20px; width: 100%; display: flex; justify-content: center; z-index: 20; }
+.health-bar {
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
+    padding: 10px 30px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1);
+    display: flex; flex-direction: column; align-items: center;
+}
+.hp-label { font-size: 0.6rem; letter-spacing: 2px; color: #888; margin-bottom: 5px; }
+.hearts-row { font-size: 1.2rem; color: #e11d48; display: flex; gap: 5px; }
+.gold-heart { color: #fbbf24; filter: drop-shadow(0 0 5px #fbbf24); animation: spin 3s infinite linear; }
+
+/* Final Letter */
+.letter-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100;
+    display: flex; justify-content: center; align-items: center;
+    animation: fadeIn 2s ease;
+}
+.letter-paper {
+    background: #111; border: 1px solid #333; padding: 40px;
+    max-width: 90%; text-align: center; box-shadow: 0 0 50px rgba(0,0,0,0.8);
+}
+.letter-paper h2 { font-family: 'Cinzel', serif; margin-bottom: 20px; color: #fcd34d; }
+.letter-paper p { margin-bottom: 30px; line-height: 1.8; color: #ccc; }
+.btn-wa {
+    background: #25D366; color: white; padding: 12px 30px; text-decoration: none;
+    font-weight: bold; border-radius: 30px; display: inline-block;
+}
+
+/* Animations & Utils */
+.hidden { display: none !important; }
+@keyframes blink { 50% { opacity: 0; } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes spin { to { transform: rotateY(360deg); } }
+@keyframes shake { 0% { transform: translate(0,0); } 20% { transform: translate(-5px, 5px); } 40% { transform: translate(5px, -5px); } 60% { transform: translate(-5px, -5px); } 80% { transform: translate(5px, 5px); } 100% { transform: translate(0,0); } }
+.shake-anim { animation: shake 0.5s; }
+
+/* Snow */
+.snow-layer { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
+.snowflake { position: absolute; color: white; animation: fall linear infinite; opacity: 0.7; }
+@keyframes fall { to { transform: translateY(110vh); } }
