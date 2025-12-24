@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Urbanist:wght@300;400;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 
     <style>
         /* --- RESET & VARIABLES --- */
@@ -18,11 +19,12 @@
             --glass-border: rgba(100, 255, 218, 0.1); 
             --text-narrative: #ccd6f6; 
             --text-aksa: #64ffda; /* Neon Cyan */
+            --text-anggun: #bd93f9; /* Pastel Purple */
             --text-aksa-bubble: #e6f1ff;
             --heart-red: #ff5d73;
             --heart-gold: #ffd700;
-            --float-pos: #2ecc71; /* Warna +1 */
-            --float-neg: #e74c3c; /* Warna -1 */
+            --float-pos: #2ecc71;
+            --float-neg: #e74c3c;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -59,7 +61,7 @@
             flex-shrink: 0;
             padding-top: 10px;
             z-index: 20;
-            position: relative; /* Untuk floating text */
+            position: relative;
         }
 
         .heart-bar {
@@ -82,17 +84,12 @@
         }
         .heart.golden { color: var(--heart-gold); font-size: 1.5rem; filter: drop-shadow(0 0 10px var(--heart-gold)); }
 
-        /* FLOATING TEXT (+1 / -1) */
         .floating-text {
-            position: absolute;
-            font-weight: bold;
-            font-size: 1.5rem;
-            animation: floatUp 1s ease-out forwards;
-            pointer-events: none;
+            position: absolute; font-weight: bold; font-size: 1.5rem;
+            animation: floatUp 1s ease-out forwards; pointer-events: none;
             text-shadow: 0 0 5px rgba(0,0,0,0.8);
         }
-        .float-plus { color: var(--float-pos); }
-        .float-minus { color: var(--float-neg); }
+        .float-plus { color: var(--float-pos); } .float-minus { color: var(--float-neg); }
 
         /* --- CHAT AREA --- */
         #chat-area {
@@ -108,126 +105,33 @@
         #chat-area::-webkit-scrollbar { display: none; }
 
         /* --- DIALOG STYLES --- */
-        .narrative-box {
-            text-align: center;
-            margin: 10px 0;
-            animation: fadeIn 1s ease;
-        }
-        .narrative-text {
-            font-family: 'Cinzel', serif; 
-            color: var(--text-narrative);
-            font-size: 1.1rem;
-            line-height: 1.6;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-        }
+        .narrative-box { text-align: center; margin: 10px 0; animation: fadeIn 1s ease; }
+        .narrative-text { font-family: 'Cinzel', serif; color: var(--text-narrative); font-size: 1.1rem; line-height: 1.6; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
 
-        .aksa-wrapper {
-            align-self: flex-start;
-            max-width: 85%;
-            margin-bottom: 5px;
-            animation: slideRight 0.5s ease;
-        }
-        .aksa-name {
-            font-size: 0.7rem;
-            color: var(--text-aksa);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 4px;
-            margin-left: 12px;
-            font-weight: 700;
-        }
-        .aksa-bubble {
-            background: rgba(23, 42, 69, 0.9);
-            border: 1px solid var(--glass-border);
-            border-left: 4px solid var(--text-aksa);
-            padding: 15px 18px;
-            border-radius: 0px 20px 20px 20px;
-            color: var(--text-aksa-bubble);
-            font-size: 0.95rem;
-            line-height: 1.5;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            position: relative;
-        }
+        /* AKSA CHAT */
+        .aksa-wrapper { align-self: flex-start; max-width: 85%; margin-bottom: 5px; animation: slideRight 0.5s ease; }
+        .aksa-name { font-size: 0.7rem; color: var(--text-aksa); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 4px; margin-left: 12px; font-weight: 700; }
+        .aksa-bubble { background: rgba(23, 42, 69, 0.9); border: 1px solid var(--glass-border); border-left: 4px solid var(--text-aksa); padding: 15px 18px; border-radius: 0px 20px 20px 20px; color: var(--text-aksa-bubble); font-size: 0.95rem; line-height: 1.5; box-shadow: 0 4px 15px rgba(0,0,0,0.3); position: relative; }
 
-        .typing-cursor::after {
-            content: '';
-            display: inline-block;
-            width: 2px;
-            height: 1em;
-            background-color: var(--text-aksa);
-            margin-left: 2px;
-            animation: blink 1s infinite;
-            vertical-align: middle;
-        }
+        /* ANGGUN CHAT */
+        .anggun-wrapper { align-self: flex-end; max-width: 85%; margin-bottom: 5px; animation: slideLeft 0.3s ease; display: flex; flex-direction: column; align-items: flex-end; }
+        .anggun-name { font-size: 0.7rem; color: var(--text-anggun); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 4px; margin-right: 12px; font-weight: 700; }
+        .anggun-bubble { background: rgba(45, 20, 60, 0.8); border: 1px solid rgba(189, 147, 249, 0.3); border-right: 4px solid var(--text-anggun); padding: 15px 18px; border-radius: 20px 0px 20px 20px; color: #f8f8f2; font-size: 0.95rem; line-height: 1.5; box-shadow: 0 4px 15px rgba(0,0,0,0.3); position: relative; text-align: left; }
+
+        .typing-cursor::after { content: ''; display: inline-block; width: 2px; height: 1em; background-color: currentColor; margin-left: 2px; animation: blink 1s infinite; vertical-align: middle; }
 
         /* --- INPUT AREA --- */
-        #input-area {
-            flex-shrink: 0;
-            min-height: 80px;
-            padding: 15px 20px 30px 20px; 
-            background: linear-gradient(to top, rgba(2,12,27,1) 40%, rgba(2,12,27,0));
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            gap: 10px;
-            z-index: 30;
-        }
-
-        .btn-choice {
-            background: rgba(100, 255, 218, 0.08);
-            border: 1px solid rgba(100, 255, 218, 0.3);
-            color: white;
-            padding: 16px 20px;
-            border-radius: 12px;
-            text-align: left;
-            font-family: 'Urbanist', sans-serif;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            animation: fadeInUp 0.4s ease backwards;
-            backdrop-filter: blur(5px);
-        }
+        #input-area { flex-shrink: 0; min-height: 80px; padding: 15px 20px 30px 20px; background: linear-gradient(to top, rgba(2,12,27,1) 40%, rgba(2,12,27,0)); display: flex; flex-direction: column; justify-content: flex-end; gap: 10px; z-index: 30; }
+        .btn-choice { background: rgba(100, 255, 218, 0.08); border: 1px solid rgba(100, 255, 218, 0.3); color: white; padding: 16px 20px; border-radius: 12px; text-align: left; font-family: 'Urbanist', sans-serif; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; animation: fadeInUp 0.4s ease backwards; backdrop-filter: blur(5px); }
         .btn-choice:active { transform: scale(0.98); }
-
         .input-wrapper { display: flex; gap: 10px; width: 100%; animation: fadeInUp 0.4s ease backwards; }
-        .aesthetic-input {
-            flex-grow: 1;
-            background: rgba(255,255,255,0.07);
-            border: 1px solid var(--glass-border);
-            padding: 14px;
-            border-radius: 12px;
-            color: white;
-            outline: none;
-            font-family: 'Urbanist', sans-serif;
-        }
-        .btn-send {
-            background: var(--text-aksa);
-            color: #020c1b;
-            border: none;
-            padding: 0 20px;
-            border-radius: 12px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+        .aesthetic-input { flex-grow: 1; background: rgba(255,255,255,0.07); border: 1px solid var(--glass-border); padding: 14px; border-radius: 12px; color: white; outline: none; font-family: 'Urbanist', sans-serif; }
+        .btn-send { background: var(--text-aksa); color: #020c1b; border: none; padding: 0 20px; border-radius: 12px; font-weight: bold; cursor: pointer; }
 
         /* --- CARD & MODAL --- */
-        #card-scene {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 50;
-            opacity: 0;
-            transition: opacity 1s ease;
-            background: transparent;
-        }
-        .scene-title {
-            font-family: 'Great Vibes', cursive; font-size: 2.5rem; color: var(--heart-gold); margin-bottom: 20px; text-align: center; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-        }
-        .scene-desc {
-            font-family: 'Cinzel', serif; font-size: 1rem; color: white; margin-bottom: 30px; text-align: center; max-width: 85%; line-height: 1.5;
-        }
+        #card-scene { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 50; opacity: 0; transition: opacity 1s ease; background: transparent; }
+        .scene-title { font-family: 'Great Vibes', cursive; font-size: 2.5rem; color: var(--heart-gold); margin-bottom: 20px; text-align: center; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+        .scene-desc { font-family: 'Cinzel', serif; font-size: 1rem; color: white; margin-bottom: 30px; text-align: center; max-width: 85%; line-height: 1.5; }
         .cards-container { display: flex; flex-direction: row; gap: 15px; flex-wrap: wrap; justify-content: center; perspective: 1000px; }
 
         .flip-card { background-color: transparent; width: 110px; height: 180px; perspective: 1000px; cursor: pointer; }
@@ -250,20 +154,18 @@
         .btn-done { background: var(--text-aksa); color: #000; padding: 12px 40px; border-radius: 30px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1rem; }
 
         #final-score { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 70; background: black; opacity: 0; transition: opacity 1s ease; }
-        .score-box { text-align: center; }
+        .score-box { text-align: center; width: 90%; max-width: 400px; }
         .score-title { font-size: 2rem; color: white; font-family: 'Urbanist', sans-serif; margin-bottom: 20px; }
         .heart-count { font-size: 3rem; color: var(--heart-red); font-weight: bold; margin-bottom: 10px; }
-        .golden-status { font-size: 1.2rem; color: #555; margin-bottom: 40px; }
+        .golden-status { font-size: 1.2rem; color: #555; margin-bottom: 30px; }
         .golden-status.active { color: var(--heart-gold); text-shadow: 0 0 10px var(--heart-gold); }
+        .final-message { color: white; margin-bottom: 20px; font-style: italic; font-size: 1.1rem; line-height: 1.5; padding: 0 10px; }
         .btn-restart { background: transparent; border: 1px solid white; color: white; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-top: 20px; }
 
         /* --- FX --- */
         .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
         .flash-red { animation: flashRed 0.5s; }
-        
-        /* NEW: TRIPLE FLASH FOR SOS */
         .flash-red-triple { animation: flashRedTriple 1.5s; } 
-
         #snow { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0; transition: opacity 2s; z-index: 5; }
         .snowflake { position: absolute; color: white; animation: fall linear infinite; }
 
@@ -272,30 +174,20 @@
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideRight { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes slideLeft { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
         @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
         @keyframes flashRed { 0% { background: rgba(255,0,0,0.3); } 100% { background: transparent; } }
-        @keyframes flashRedTriple { 
-            0%, 33%, 66% { background: rgba(255,0,0,0.5); } 
-            16%, 50%, 83%, 100% { background: transparent; } 
-        }
+        @keyframes flashRedTriple { 0%, 33%, 66% { background: rgba(255,0,0,0.5); } 16%, 50%, 83%, 100% { background: transparent; } }
         @keyframes fall { to { transform: translateY(100vh); } }
         @keyframes heartPop { 0% { transform: scale(0); } 70% { transform: scale(1.3); } 100% { transform: scale(1); } }
-        
-        /* NEW: FLOAT UP ANIMATION */
-        @keyframes floatUp {
-            0% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-30px) scale(1.2); }
-        }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-30px) scale(1.2); } }
 
     </style>
 </head>
 <body>
 
     <div id="snow"></div>
-
-    <audio id="bgm" loop>
-        <source src="lagu.mp3" type="audio/mpeg">
-    </audio>
+    <audio id="bgm" loop><source src="lagu.mp3" type="audio/mpeg"></audio>
 
     <div id="game-wrapper">
         <div id="hud-area">
@@ -316,8 +208,9 @@
                 <div class="flip-card-inner">
                     <div class="flip-card-front"><i class="fa-solid fa-flag card-icon"></i><div class="card-title">Kartu Mengalah</div></div>
                     <div class="flip-card-back">
-                        <div class="card-title">KARTU MENGALAH</div><div class="card-desc">Aksa harus mengalah, minta maaf tulus, dan memperbaiki keadaan.</div>
-                        <button class="btn-select-card" onclick="confirmSelection(event, 'Kartu Mengalah', 'Aksa harus mengalah, minta maaf tulus, dan memperbaiki keadaan. (Max 5x)', 'fa-flag')">PILIH</button>
+                        <div class="card-title">KARTU MENGALAH</div>
+                        <div class="card-desc">Kartu ini membuat Aksa apapun masalahnya harus mengalah, minta maaf tulus, atau memaafkan apapun, dan memperbaiki keadaan yang sedang kacau. (Max 5x)</div>
+                        <button class="btn-select-card" onclick="confirmSelection(event, 'Kartu Mengalah', 'Kartu ini membuat Aksa apapun masalahnya harus mengalah, minta maaf tulus, atau memaafkan apapun, dan memperbaiki keadaan yang sedang kacau. (Max 5x)', 'fa-flag')">PILIH</button>
                     </div>
                 </div>
             </div>
@@ -325,8 +218,9 @@
                 <div class="flip-card-inner">
                     <div class="flip-card-front"><i class="fa-solid fa-comments card-icon"></i><div class="card-title">Kartu Jawaban</div></div>
                     <div class="flip-card-back">
-                        <div class="card-title">KARTU JAWABAN</div><div class="card-desc">Aksa harus menjawab jujur apapun pertanyaan Anggun.</div>
-                        <button class="btn-select-card" onclick="confirmSelection(event, 'Kartu Jawaban', 'Aksa harus menjawab jujur apapun pertanyaan Anggun. (Max 5x)', 'fa-comments')">PILIH</button>
+                        <div class="card-title">KARTU JAWABAN</div>
+                        <div class="card-desc">Kartu ini membuat Aksa harus menjawab atau mengakui secara jujur apapun pertanyaan yang diberikan oleh Anggun. (Max 5x)</div>
+                        <button class="btn-select-card" onclick="confirmSelection(event, 'Kartu Jawaban', 'Kartu ini membuat Aksa harus menjawab atau mengakui secara jujur apapun pertanyaan yang diberikan oleh Anggun. (Max 5x)', 'fa-comments')">PILIH</button>
                     </div>
                 </div>
             </div>
@@ -334,8 +228,9 @@
                 <div class="flip-card-inner">
                     <div class="flip-card-front"><i class="fa-solid fa-gift card-icon"></i><div class="card-title">Kartu Permintaan</div></div>
                     <div class="flip-card-back">
-                        <div class="card-title">KARTU PERMINTAAN</div><div class="card-desc">Request permintaan apapun dalam 24 Jam setelah Claim.</div>
-                        <button class="btn-select-card" onclick="confirmSelection(event, 'Kartu Permintaan', 'Request permintaan apapun dalam 24 Jam setelah Claim. (1x)', 'fa-gift')">PILIH</button>
+                        <div class="card-title">KARTU PERMINTAAN</div>
+                        <div class="card-desc">Kartu ini hanya bisa dipakai sekali dan request permintaan hanya bisa dilakukan dalam 24 Jam setelah Claim.</div>
+                        <button class="btn-select-card" onclick="confirmSelection(event, 'Kartu Permintaan', 'Kartu ini hanya bisa dipakai sekali dan request permintaan hanya bisa dilakukan dalam 24 Jam setelah Claim.', 'fa-gift')">PILIH</button>
                     </div>
                 </div>
             </div>
@@ -354,7 +249,7 @@
             <div class="scene-title">Game Over</div>
             <div style="font-size: 1rem; color: #aaa; margin-bottom: 5px;">Total Hearts Collected:</div><div class="heart-count" id="final-heart-count">0</div>
             <div style="font-size: 1rem; color: #aaa; margin-bottom: 5px;">Golden Heart Status:</div><div class="golden-status" id="final-golden-status">NOT FOUND</div>
-            <p style="color:white; margin-top:20px; font-style:italic;">"Terima kasih sudah bermain, Sayang..."</p>
+            <div class="final-message" id="final-message-text"></div>
             <button class="btn-restart" onclick="location.reload()">Ulangi Dari Awal</button>
         </div>
     </div>
@@ -363,7 +258,6 @@
         // --- AUDIO ENGINE ---
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
-        
         function initAudio() { if (!audioCtx) audioCtx = new AudioContext(); if (audioCtx.state === 'suspended') audioCtx.resume(); }
         function playBGM() { const bgm = document.getElementById('bgm'); bgm.volume = 0.4; bgm.play().catch(e => console.log("BGM error")); }
 
@@ -410,28 +304,19 @@
             gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
             osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.3);
         }
-        
-        // NEW: NINU NINU SIREN SOUND
         function playSOSSound() {
             initAudio(); if (!audioCtx) return;
-            const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            
-            osc.type = 'triangle';
-            // Frekuensi naik turun (Ninu Ninu)
-            osc.frequency.setValueAtTime(600, now);
-            osc.frequency.linearRampToValueAtTime(850, now + 0.3);
-            osc.frequency.linearRampToValueAtTime(600, now + 0.6);
-            osc.frequency.linearRampToValueAtTime(850, now + 0.9);
-            osc.frequency.linearRampToValueAtTime(600, now + 1.2);
-            osc.frequency.linearRampToValueAtTime(850, now + 1.5);
-
-            gain.gain.setValueAtTime(0.1, now);
-            gain.gain.linearRampToValueAtTime(0.001, now + 1.5);
-
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(now); osc.stop(now + 1.5);
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.type = 'triangle'; const now = audioCtx.currentTime;
+            osc.frequency.setValueAtTime(600, now); osc.frequency.linearRampToValueAtTime(850, now+0.3); osc.frequency.linearRampToValueAtTime(600, now+0.6); osc.frequency.linearRampToValueAtTime(850, now+0.9); osc.frequency.linearRampToValueAtTime(600, now+1.2); osc.frequency.linearRampToValueAtTime(850, now+1.5);
+            gain.gain.setValueAtTime(0.1, now); gain.gain.linearRampToValueAtTime(0.001, now+1.5);
+            osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(now+1.5);
+        }
+        function playConfettiSound() {
+            initAudio(); if (!audioCtx) return; const now = audioCtx.currentTime;
+            const noise = audioCtx.createBufferSource(); const buffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.1, audioCtx.sampleRate); const data = buffer.getChannelData(0); for(let i=0; i<data.length; i++) data[i] = Math.random()*2 -1; noise.buffer = buffer;
+            const noiseFilter = audioCtx.createBiquadFilter(); noiseFilter.type = 'highpass'; noiseFilter.frequency.value = 1000; const noiseGain = audioCtx.createGain(); noiseGain.gain.setValueAtTime(0.3, now); noiseGain.gain.exponentialRampToValueAtTime(0.001, now+0.1); noise.connect(noiseFilter); noiseFilter.connect(noiseGain); noiseGain.connect(audioCtx.destination); noise.start(now);
+            [523.25, 659.25, 783.99].forEach((f, i) => { const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); osc.type = 'sawtooth'; osc.frequency.setValueAtTime(f, now + i*0.05); gain.gain.setValueAtTime(0, now + i*0.05); gain.gain.linearRampToValueAtTime(0.1, now + i*0.05 + 0.05); gain.gain.exponentialRampToValueAtTime(0.001, now + i*0.05 + 0.4); osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now + i*0.05); osc.stop(now + i*0.05 + 0.5); });
         }
 
         // --- VISUAL LOGIC ---
@@ -445,101 +330,177 @@
         const wait = (ms) => new Promise(res => setTimeout(res, ms));
         function scrollToBottom() { setTimeout(() => { chatArea.scrollTo({ top: chatArea.scrollHeight, behavior: 'smooth' }); }, 100); }
 
-        // HELPER: Show Floating Text
         function showFloatingText(text, isPositive) {
-            const el = document.createElement('div');
-            el.className = `floating-text ${isPositive ? 'float-plus' : 'float-minus'}`;
-            el.innerText = text;
-            
-            // Random position near center top
-            const offset = (Math.random() * 40) - 20;
-            el.style.left = `calc(50% + ${offset}px)`;
-            el.style.top = '10px';
-            
-            hudArea.appendChild(el);
-            setTimeout(() => el.remove(), 1000);
+            const el = document.createElement('div'); el.className = `floating-text ${isPositive ? 'float-plus' : 'float-minus'}`; el.innerText = text;
+            const offset = (Math.random() * 40) - 20; el.style.left = `calc(50% + ${offset}px)`; el.style.top = '10px';
+            hudArea.appendChild(el); setTimeout(() => el.remove(), 1000);
         }
 
         async function typeText(element, text) {
-            element.classList.add('typing-cursor');
-            let i = 0; initAudio(); 
+            element.classList.add('typing-cursor'); let i = 0; initAudio(); 
             while (i < text.length) {
                 if (text[i] === '<') { let tag = ''; while (text[i] !== '>' && i < text.length) { tag += text[i++]; } tag += '>'; i++; element.innerHTML += tag; }
                 else { const char = text[i++]; element.innerHTML += char; if (char !== ' ') playTypeSound(); await wait(TYPING_SPEED); }
                 chatArea.scrollTop = chatArea.scrollHeight;
-            }
-            element.classList.remove('typing-cursor');
+            } element.classList.remove('typing-cursor');
         }
+        
         async function msgNarrative(text) { const div = document.createElement('div'); div.className = 'narrative-box'; div.innerHTML = `<div class="narrative-text"></div>`; chatArea.appendChild(div); await typeText(div.querySelector('.narrative-text'), text); scrollToBottom(); }
         async function msgAksa(text) { const div = document.createElement('div'); div.className = 'aksa-wrapper'; div.innerHTML = `<div class="aksa-name">Aksa</div><div class="aksa-bubble"></div>`; chatArea.appendChild(div); await typeText(div.querySelector('.aksa-bubble'), text); scrollToBottom(); }
-        function showButtons(options) { inputArea.innerHTML = ''; options.forEach((opt, idx) => { const btn = document.createElement('button'); btn.className = 'btn-choice'; btn.innerHTML = opt.text; btn.style.animationDelay = `${idx * 0.1}s`; btn.onclick = () => { playClickSound(); inputArea.innerHTML = ''; opt.action(); }; inputArea.appendChild(btn); }); scrollToBottom(); }
-        function showTextInput(placeholder, callback) { inputArea.innerHTML = `<div class="input-wrapper"><input type="text" id="userInput" class="aesthetic-input" placeholder="${placeholder}" autocomplete="off"><button class="btn-send" id="sendBtn"><i class="fa-solid fa-arrow-right"></i></button></div>`; const input = document.getElementById('userInput'); const btn = document.getElementById('sendBtn'); input.focus(); scrollToBottom(); const submit = () => { playClickSound(); const val = input.value; if(!val) return; inputArea.innerHTML = ''; callback(val); }; btn.onclick = submit; input.addEventListener('keypress', (e) => { if(e.key === 'Enter') submit(); }); }
+        
+        // INSTANT BUBBLE (NO TYPING FOR USER)
+        async function msgAnggun(text) {
+            const div = document.createElement('div'); div.className = 'anggun-wrapper';
+            div.innerHTML = `<div class="anggun-name">Anggun</div><div class="anggun-bubble">${text}</div>`;
+            chatArea.appendChild(div);
+            scrollToBottom();
+        }
 
-        // UPDATED HEART SYSTEM
+        function showButtons(options, showBubble = true) {
+            inputArea.innerHTML = ''; 
+            options.forEach((opt, idx) => {
+                const btn = document.createElement('button'); btn.className = 'btn-choice'; btn.innerHTML = opt.text; btn.style.animationDelay = `${idx * 0.1}s`;
+                btn.onclick = async () => { 
+                    playClickSound(); inputArea.innerHTML = ''; 
+                    if(showBubble) { 
+                        // Remove "A.", "B." prefix for bubble
+                        let cleanText = opt.text.replace(/^[A-D]\.\s*/, '');
+                        await msgAnggun(cleanText); 
+                        await wait(500); 
+                    }
+                    opt.action(); 
+                }; 
+                inputArea.appendChild(btn);
+            }); scrollToBottom();
+        }
+
+        function showTextInput(placeholder, callback) {
+            inputArea.innerHTML = `<div class="input-wrapper"><input type="text" id="userInput" class="aesthetic-input" placeholder="${placeholder}" autocomplete="off"><button class="btn-send" id="sendBtn"><i class="fa-solid fa-arrow-right"></i></button></div>`;
+            const input = document.getElementById('userInput'); const btn = document.getElementById('sendBtn'); input.focus(); scrollToBottom();
+            const submit = async () => { 
+                playClickSound(); const val = input.value; if(!val) return; inputArea.innerHTML = ''; 
+                await msgAnggun(val); await wait(500); callback(val); 
+            }; 
+            btn.onclick = submit; input.addEventListener('keypress', (e) => { if(e.key === 'Enter') submit(); });
+        }
+
         function updateHearts(delta, isGolden = false) {
             heartBar.style.opacity = '1'; heartBar.style.transform = 'translateY(0)';
-            
             if (delta > 0) {
                 if(isGolden) playHeartSound(true); else playHeartSound(false);
-                showFloatingText(`+${delta}`, true); // Show +1
+                showFloatingText(`+${delta}`, true);
                 for(let i=0; i<delta; i++) { const h = document.createElement('i'); h.className = `fa-solid fa-heart heart ${isGolden ? 'golden' : ''}`; heartBar.appendChild(h); }
             } else if (delta < 0) {
-                playErrorSound();
-                showFloatingText(`${delta}`, false); // Show -1
-                
-                // Normal Shake only (SOS triple flash handled separately)
-                document.body.classList.add('shake', 'flash-red');
-                setTimeout(() => document.body.classList.remove('shake', 'flash-red'), 500);
-                
-                const hearts = heartBar.querySelectorAll('.heart');
-                const count = Math.min(Math.abs(delta), hearts.length);
+                playErrorSound(); showFloatingText(`${delta}`, false);
+                document.body.classList.add('shake', 'flash-red'); setTimeout(() => document.body.classList.remove('shake', 'flash-red'), 500);
+                const hearts = heartBar.querySelectorAll('.heart'); const count = Math.min(Math.abs(delta), hearts.length);
                 for(let i=0; i<count; i++) { if(hearts[hearts.length-1-i]) hearts[hearts.length-1-i].remove(); }
             }
         }
 
-        function breakAllHearts() {
-            playErrorSound(); heartBar.innerHTML = '';
-            document.body.classList.add('shake', 'flash-red');
-            setTimeout(() => document.body.classList.remove('shake', 'flash-red'), 800);
-        }
+        function breakAllHearts() { playErrorSound(); heartBar.innerHTML = ''; document.body.classList.add('shake', 'flash-red'); setTimeout(() => document.body.classList.remove('shake', 'flash-red'), 800); }
 
         // --- STORY LOGIC ---
-        async function start() { document.body.addEventListener('click', initAudio, { once: true }); await wait(1000); await msgNarrative("Kamu berjalan di tengah taman..."); await wait(500); await msgNarrative("Kamu menemukan korek yang tampak tak asing"); showButtons([{ text: "Ambil", action: scene1 }, { text: "Percayakan keputusan pada hatimu", action: scene1 }]); }
+        async function start() { document.body.addEventListener('click', initAudio, { once: true }); await wait(1000); await msgNarrative("Kamu berjalan di tengah taman..."); await wait(500); await msgNarrative("Kamu menemukan korek yang tampak tak asing"); showButtons([{ text: "Ambil", action: scene1 }, { text: "Percayakan keputusan pada hatimu", action: scene1 }], false); }
         async function scene1() { await msgNarrative("Kamu mengambil Korek."); await wait(1000); await msgAksa("Hey itu korek milikku, berhenti dan kembalikan!"); await wait(800); await msgAksa("Untuk apa kamu ambil korekku, ini pemberian pacarku!"); await wait(800); await msgAksa("Sebentar... sepertinya kamu tidak asing."); await wait(500); await msgAksa("Siapa kamu?"); askName(); }
         function askName() { showTextInput("Ketik jawaban...", async (val) => { const keywords = ["ayang", "anggun", "pacar", "aksa"]; if (keywords.some(k => val.toLowerCase().includes(k))) { playBGM(); await msgAksa("Kukira siapa, ternyata ayangcuuu ❤️"); await wait(1000); startQuiz(); } else { playErrorSound(); document.body.classList.add('shake'); setTimeout(() => document.body.classList.remove('shake'), 500); await msgAksa("Sepertinya aku salah orang..."); await wait(500); askName(); } }); }
         
-        async function startQuiz() { playSystemSound(); await msgNarrative("Heart System Activated ❤️"); updateHearts(0); await msgAksa("Udah mendekati penghujung tahun ya, gak kerasa."); await wait(800); await msgAksa("Sebelum lanjut, aku mau nanya beberapa hal..."); await wait(1000); await msgAksa("Seberapa sering aku bikin kamu elus dada (nahan emosi bukan grepe ya!) belakangan ini?"); showButtons([ { text: "A. Jarang sih, kamu anak baik.", action: () => ansQ1('A') }, { text: "B. Sering banget! Rasanya pengen aku karungin.", action: () => ansQ1('B') }, { text: "C. Tiap menit. Untung aku sabar.", action: () => ansQ1('C') } ]); }
-        async function ansQ1(ans) { updateHearts(1); if(ans==='A') await msgAksa("Woiyaaa jelas hehe, tapi jujur aku ngerasa bersalah banyak sama kamu, aku kurang baik, masih perlu banyak belajar, temenin aku terus yaaa, dan makasih udah pilih jawaban ini wkwkw ❤️❤️❤️❤️❤️"); if(ans==='B') await msgAksa("Kek anak kucing aja akuuu ish, ayang harus sabarrr, masa sih aku mau dibuang huaaa 😭"); if(ans==='C') await msgAksa("Hehe, sabar-sabar ayangcuu, sehat-sehat orang sabar, orang sabar pantatnya lebar 😜"); nextQ2(); }
-        async function nextQ2() { await wait(1000); await msgAksa("Kebiasaan jelek dari aku apa yang kamu paling cintain (benci deng hehe)?"); showButtons([ { text: "A. Suka ilang tiba-tiba", action: () => ansQ2('A') }, { text: "B. Kadang romantis, kadang nyebelin", action: () => ansQ2('B') }, { text: "C. Suka marah-marah kaya monster", action: () => ansQ2('C') } ]); }
-        async function ansQ2(ans) { updateHearts(1); if(ans==='A') await msgAksa("Yah ketauan... maaf ya ayang, nanti aku coba lebih satsetsatset crot balesnya."); if(ans==='B') await msgAksa("Biar hubungan kita gak datar looo yang! wkwk canda deng, maafin mood swing aku ya, aku usahain stabil kayak kurs rupiah (eh jangan deng, turun dong)."); if(ans==='C') await msgAksa("Rawr! 🦖 Monster ini sebenernya jinak kok, cuma butuh dielus dikit biar jadi kucing lagi. Jangan benci monstermu ini ya..."); nextQ3(); }
-        async function nextQ3() { await wait(1000); await msgAksa("Sekarang tentang kamu. Dunia lagi berisik banget ya akhir-akhir ini? Jujur deh, seberapa penuh 'isi kepala' kamu sekarang?"); showButtons([ { text: "A. Masih aman terkendali.", action: () => ansQ3('A') }, { text: "B. Lumayan penuh, butuh istirahat.", action: () => ansQ3('B') }, { text: "C. Udah mau meledak, butuh pelukan darurat. 🆘", action: () => ansQ3('C') } ]); }
-        
-        async function ansQ3(ans) { 
-            if(ans === 'C') { 
-                // TRIPLE RED FLASH & NINU NINU SOUND
-                playSOSSound(); 
-                document.body.classList.add('flash-red-triple'); // 3x Flash
-                setTimeout(() => document.body.classList.remove('flash-red-triple'), 1500);
-                
-                updateHearts(2); 
-                await msgAksa("RED CODE!! 🚨 Meluncurkan rudal pelukan dan ciuman sekarang juga! Bertahan di sana prajurit, bantuan datang!"); 
-            } else if (ans === 'B') { updateHearts(1); await msgAksa("Sini senderan dulu. Charge energi kamu di aku, gratis kok seumur hidup khusus member VVIP kayak kamu."); } 
-            else { updateHearts(1); await msgAksa("Alhamdulillah kalau gitu. Keren banget pacarku mental baja! Jangan lupa setoran cerita hari ini ya."); }
-            nextQ4();
+        async function startQuiz() { playSystemSound(); await msgNarrative("Heart System Activated ❤️"); updateHearts(0); await msgAksa("Udah mendekati penghujung tahun ya, gak kerasa."); await wait(800); await msgAksa("Sebelum lanjut, aku mau nanya beberapa hal..."); await wait(1000); await msgAksa("Seberapa sering aku bikin kamu elus dada (nahan emosi bukan grepe ya!) belakangan ini?"); 
+            showButtons([ 
+                { text: "A. Jarang sih, kamu anak baik. 😇", action: () => ansQ1('A') }, 
+                { text: "B. Sering banget! Rasanya pengen aku karungin... 😤", action: () => ansQ1('B') }, 
+                { text: "C. Tiap menit. Untung aku sabar. 🧘‍♀️", action: () => ansQ1('C') } 
+            ]); 
         }
-
-        async function nextQ4() { await wait(1000); await msgAksa("Kita udah lewatin banyak drama, berantem, baikan lagi. Kalau boleh tau... apa sih satu hal yang bikin kamu masih mau stay sama cowok aneh kayak aku?"); showButtons([ { text: "A. Karena kamu satu-satunya yang paham anehnya aku.", action: () => ansQ4('A') }, { text: "B. Karena senyebelin apa pun kamu, aku tetep nyaman.", action: () => ansQ4('B') }, { text: "C. Terpaksa aja sih... (Canda! ❤️)", action: () => ansQ4('C') } ]); }
-        async function ansQ4(ans) { if(ans === 'C') { breakAllHearts(); playGunshotSound(); setTimeout(playGunshotSound, 300); setTimeout(playGunshotSound, 600); await msgNarrative("DOR! DOR! DOR!"); await msgAksa("CUIHHHHHH. Ulang gak! Harus ulang! 👻"); showButtons([{ text: "Hidup lagi & Ulang", action: () => { heartBar.innerHTML = ''; nextQ4(); }}]); } else if (ans === 'A') { updateHearts(2); await msgAksa("Emang cuma kamu pawang aku, dan cuma aku pawang kamu. Kita tuh sama-sama aneh tapi klop seduniaaa."); nextQ5(); } else { updateHearts(1); await msgAksa("Rumah... Makasih udah anggep aku rumah ya. Aku bakal jaga kenyamanan ini terus."); nextQ5(); } }
-        async function nextQ5() { await wait(1000); await msgAksa("Bayangin kita udah tua nanti, ompong dan keriput. Kira-kira kita bakal jadi kakek-nenek tipe apa?"); showButtons([ { text: "A. Pasangan Caboell 💃", action: () => ansQ5('A') }, { text: "B. Pasangan Rusuh", action: () => ansQ5('B') }, { text: "C. Pasangan Lengket", action: () => ansQ5('C') }, { text: "D. Dorong kursi roda ke jurang", action: () => ansQ5('D') } ]); }
-        async function ansQ5(ans) { if(ans === 'D') { updateHearts(-3); await msgAksa("ASTAGHFIRULLAH! Durhaka sama suami sendiri! tega betulll ayangniii 😭💔"); } else if (ans === 'A') { updateHearts(3); await msgAksa("Waduh ayang cabuulkuuuu, harus nongkrong tempat jamu ini mah biar makin strong 😏🔥"); } else if (ans === 'C') { updateHearts(2); await msgAksa("Aamiin... Sambil ngeteh sore liatin cucu main. Kita usahain yaa apapun harganya, selama bareng-bareng pasti bisa!."); } else { updateHearts(1); await msgAksa("Rusuh tapi cinta kan? Nanti kita debatin gigi palsu siapa yang copot di kamar mandi wkwk."); } nextQ6(); }
-        async function nextQ6() { await wait(1000); await msgAksa("Pertanyaan terakhir sebelum... ah sudahlah. Intinya, kalau tiba-tiba cuaca jadi super dingin sekarang, apa yang paling kamu butuhin?"); showButtons([ { text: "A. Selimut tebel.", action: () => ansQ6('A') }, { text: "B. Indomie kuah + Telor. 🍜", action: () => ansQ6('B') }, { text: "C. Kehangatan dari kamu (Peluk!). 🫂", action: () => ansQ6('C') } ]); }
-        async function ansQ6(ans) { if(ans === 'C') { hasGoldenHeart = true; await msgNarrative("Achievement: Rumah Ternyaman"); updateHearts(1, true); triggerEnding(); } else if (ans === 'B') { hasGoldenHeart = false; await msgAksa("Malah laper dasar... Perut ayang bangettt ga heran! Tapi enak sih, bagi ya nanti."); updateHearts(-1); triggerEnding(); } else { hasGoldenHeart = false; await msgAksa("Yaa... anget sih. Tapi kurang romantis wuu! Tapi gapapa juga si kalo selimutannya berduaaa."); updateHearts(1); triggerEnding(); } }
+        async function ansQ1(ans) { updateHearts(1); if(ans==='A') await msgAksa("Woiyaaa jelas hehe, tapi jujur aku ngerasa bersalah banyak sama kamu, aku kurang baik, masih perlu banyak belajar, temenin aku terus yaaa, dan makasih udah pilih jawaban ini wkwkw ❤️❤️❤️❤️❤️"); if(ans==='B') await msgAksa("Kek anak kucing aja akuuu ish, ayang harus sabarrr, masa sih aku mau dibuang huaaa 😭"); if(ans==='C') await msgAksa("Hehe, sabar-sabar ayangcuu, sehat-sehat orang sabar, orang sabar pantatnya lebar 😜"); nextQ2(); }
+        
+        async function nextQ2() { await wait(1000); await msgAksa("Kebiasaan jelek dari aku apa yang kamu paling cintain (benci deng hehe)?"); 
+            showButtons([ 
+                { text: "A. Suka ilang tiba-tiba 👻", action: () => ansQ2('A') }, 
+                { text: "B. Kadang romantis, kadang nyebelin... 🎭", action: () => ansQ2('B') }, 
+                { text: "C. Suka marah-marah kaya monster 🦖", action: () => ansQ2('C') } 
+            ]); 
+        }
+        async function ansQ2(ans) { updateHearts(1); if(ans==='A') await msgAksa("Yah ketauan... maaf ya ayang, nanti aku coba lebih satsetsatset crot balesnya."); if(ans==='B') await msgAksa("Biar hubungan kita gak datar looo yang! wkwk canda deng, maafin mood swing aku ya, aku usahain stabil kayak kurs rupiah (eh jangan deng, turun dong)."); if(ans==='C') await msgAksa("Rawr! 🦖 Monster ini sebenernya jinak kok, cuma butuh dielus dikit biar jadi kucing lagi. Jangan benci monstermu ini ya..."); nextQ3(); }
+        
+        async function nextQ3() { await wait(1000); await msgAksa("Sekarang tentang kamu. Dunia lagi berisik banget ya akhir-akhir ini? Jujur deh, seberapa penuh 'isi kepala' kamu sekarang?"); 
+            showButtons([ 
+                { text: "A. Masih aman terkendali. 😎", action: () => ansQ3('A') }, 
+                { text: "B. Lumayan penuh, butuh istirahat. 🔋", action: () => ansQ3('B') }, 
+                { text: "C. Udah mau meledak, butuh pelukan darurat. 🆘", action: () => ansQ3('C') } 
+            ]); 
+        }
+        async function ansQ3(ans) { if(ans === 'C') { playSOSSound(); document.body.classList.add('flash-red-triple'); setTimeout(() => document.body.classList.remove('flash-red-triple'), 1500); updateHearts(2); await msgAksa("RED CODE!! 🚨 Meluncurkan rudal pelukan dan ciuman sekarang juga! Bertahan di sana prajurit, bantuan datang!"); } else if (ans === 'B') { updateHearts(1); await msgAksa("Sini senderan dulu. Charge energi kamu di aku, gratis kok seumur hidup khusus member VVIP kayak kamu."); } else { updateHearts(1); await msgAksa("Alhamdulillah kalau gitu. Keren banget pacarku mental baja! Jangan lupa setoran cerita hari ini ya."); } nextQ4(); }
+        
+        async function nextQ4() { await wait(1000); await msgAksa("Kita udah lewatin banyak drama, berantem, baikan lagi. Kalau boleh tau... apa sih satu hal yang bikin kamu masih mau stay sama cowok aneh kayak aku?"); 
+            showButtons([ 
+                { text: "A. Karena kamu satu-satunya yang paham anehnya aku. 👽", action: () => ansQ4('A') }, 
+                { text: "B. Karena senyebelin apa pun kamu, aku tetep nyaman. 🏠", action: () => ansQ4('B') }, 
+                { text: "C. Terpaksa aja sih... (Canda! 😜)", action: () => ansQ4('C') } 
+            ]); 
+        }
+        async function ansQ4(ans) { if(ans === 'C') { breakAllHearts(); playGunshotSound(); setTimeout(playGunshotSound, 300); setTimeout(playGunshotSound, 600); await msgNarrative("DOR! DOR! DOR!"); await msgAksa("CUIHHHHHH. Ulang gak! Harus ulang! 👻"); showButtons([{ text: "Hidup lagi & Ulang 🔁", action: () => { heartBar.innerHTML = ''; nextQ4(); }}]); } else if (ans === 'A') { updateHearts(2); await msgAksa("Emang cuma kamu pawang aku, dan cuma aku pawang kamu. Kita tuh sama-sama aneh tapi klop seduniaaa."); nextQ5(); } else { updateHearts(1); await msgAksa("Rumah... Makasih udah anggep aku rumah ya. Aku bakal jaga kenyamanan ini terus."); nextQ5(); } }
+        
+        async function nextQ5() { await wait(1000); await msgAksa("Bayangin kita udah tua nanti, ompong dan keriput. Kira-kira kita bakal jadi kakek-nenek tipe apa?"); 
+            showButtons([ 
+                { text: "A. Pasangan caboell (Kita usahakan kakek-nenek yang masih plok plok plok itu) 💃🕺", action: () => ansQ5('A') }, 
+                { text: "B. Pasangan debat sampe tuaa 🗣️", action: () => ansQ5('B') }, 
+                { text: "C. Pasangan lengket 👵👴", action: () => ansQ5('C') }, 
+                { text: "D. Aku mau dorong kursi roda kamu ke jurang. 🏔️", action: () => ansQ5('D') } 
+            ]); 
+        }
+        async function ansQ5(ans) { 
+            if(ans === 'D') { updateHearts(-3); await msgAksa("ASTAGHFIRULLAH! Durhaka sama suami sendiri! tega betulll ayangniii 😭💔"); } 
+            else if (ans === 'A') { updateHearts(3); await msgAksa("Waduh ayang cabuulkuuuu, harus nongkrong tempat jamu ini mah biar makin strong 😏🔥"); } 
+            else if (ans === 'C') { updateHearts(1); await msgAksa("Aamiin... Sambil ngeteh sore liatin cucu main. Kita usahain yaa apapun harganya, selama bareng-bareng pasti bisa!."); } 
+            else { updateHearts(1); await msgAksa("Rusuh tapi cinta sampe tua kan? Nanti kita debatin gigi palsu siapa yang copot di kamar mandi wkwk."); } 
+            nextQ6(); 
+        }
+        
+        async function nextQ6() { await wait(1000); await msgAksa("Pertanyaan terakhir sebelum... ah sudahlah. Intinya, kalau tiba-tiba cuaca jadi super dingin sekarang, apa yang paling kamu butuhin?"); 
+            showButtons([ 
+                { text: "A. Selimutan tebel berduaan. 🛌", action: () => ansQ6('A') }, 
+                { text: "B. Indomie kuah + Telor. 🍜", action: () => ansQ6('B') }, 
+                { text: "C. Kehangatan dari kamu (Peluk!). 🫂", action: () => ansQ6('C') } 
+            ]); 
+        }
+        async function ansQ6(ans) { 
+            if(ans === 'C') { hasGoldenHeart = true; await msgNarrative("Achievement: Rumah Ternyaman"); updateHearts(1, true); triggerEnding(); } 
+            else if (ans === 'B') { hasGoldenHeart = false; await msgAksa("Malah laper dasar... Perut ayang bangettt ga heran! Tapi enak sih, bagi ya nanti."); updateHearts(-2); triggerEnding(); } 
+            else { hasGoldenHeart = false; await msgAksa("Yaa... anget sih. Tapi kurang romantic malah lebih ke cabul wuu! Tapi gapapa juga si kalo selimutannya berduaaa."); updateHearts(1); triggerEnding(); } 
+        }
         
         async function triggerEnding() { await msgAksa("Pilihan yang bagus. Ngomong-ngomong..."); document.getElementById('snow').style.opacity = '1'; setInterval(createSnowflake, 300); await wait(2000); await msgNarrative("Sepertinya, salju mulai turun..."); await wait(2000); chatArea.innerHTML = ''; const lines = [ "Oh iyaa, soal semalam..", "Aku minta maaf yaa..", "Aku tau aku berlebihan..", "Sering banget bikin ayang sakit hati..", "Tapi.. tolong jangan nyerah sama aku ya?", "Tahun baru nanti, dan tahun-tahun berikutnya..", "Tetep sama aku terus ya, sayang?", "Aku sayang banget sama kamu..", "Bener-bener minta maaf.." ]; for(let line of lines) { if(line.includes("minta maaf")) await msgNarrative(line); else await msgAksa(line); await wait(1800); } await wait(1000); if (hasGoldenHeart) { document.getElementById('game-wrapper').style.opacity = '0'; setTimeout(() => { document.getElementById('game-wrapper').style.display = 'none'; document.getElementById('card-scene').style.display = 'flex'; setTimeout(() => document.getElementById('card-scene').style.opacity = '1', 50); }, 1000); } else { showFinalScore(); } }
         function toggleFlip(cardElement) { playClickSound(); cardElement.classList.toggle('flipped'); }
         function confirmSelection(event, title, desc, iconClass) { event.stopPropagation(); playHeartSound(true); document.getElementById('modal-title').innerText = title; document.getElementById('modal-desc').innerText = desc; document.getElementById('modal-icon').className = `fa-solid ${iconClass} card-icon`; document.getElementById('selected-card-modal').style.display = 'flex'; }
         function finishCardScene() { playClickSound(); document.getElementById('selected-card-modal').style.display = 'none'; document.getElementById('card-scene').style.opacity = '0'; setTimeout(() => { document.getElementById('card-scene').style.display = 'none'; showFinalScore(); }, 1000); }
-        function showFinalScore() { playHeartSound(hasGoldenHeart); const hearts = document.querySelectorAll('.heart').length; document.getElementById('final-heart-count').innerText = hearts; const goldenStatus = document.getElementById('final-golden-status'); if(hasGoldenHeart) { goldenStatus.innerText = "FOUND (LEGENDARY)"; goldenStatus.classList.add('active'); } else { goldenStatus.innerText = "NOT FOUND"; } const scoreScreen = document.getElementById('final-score'); scoreScreen.style.display = 'flex'; setTimeout(() => scoreScreen.style.opacity = '1', 50); }
+        
+        function showFinalScore() { 
+            // Trigger Confetti
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            playConfettiSound();
+
+            playHeartSound(hasGoldenHeart); 
+            const hearts = document.querySelectorAll('.heart').length; 
+            document.getElementById('final-heart-count').innerText = hearts; 
+            const goldenStatus = document.getElementById('final-golden-status'); 
+            
+            let msg = "";
+            if (hearts < 5) msg = "huuu ayanggg masa dapet segitu doangggg 😝";
+            else if (hearts === 5) msg = "wihhh dapet 5 ayang kereeen, yaudalaa bersyukur ajaa padahal bisa lebih... hiksss 🥺";
+            else if (hearts > 5 && hearts < 10) msg = "WIHH BANYAK LOVE AYANGGG, AYANG PASTI SAYANG BANGET SAMA AKU YEYY 🥰";
+            else if (hearts >= 10) msg = "AYANGG DAPETIN SEMUA LOVE!!! Makasih sayang udah sesayang itu sama aku, tapi cinta ayang yang sebenernya aku yakin lebih-lebih dari itu semua ❤️❤️❤️";
+            
+            document.getElementById('final-message-text').innerText = msg;
+
+            if(hasGoldenHeart) { goldenStatus.innerText = "FOUND (LEGENDARY)"; goldenStatus.classList.add('active'); } 
+            else { goldenStatus.innerText = "NOT FOUND"; } 
+            
+            const scoreScreen = document.getElementById('final-score'); 
+            scoreScreen.style.display = 'flex'; 
+            setTimeout(() => scoreScreen.style.opacity = '1', 50); 
+        }
+        
         function createSnowflake() { const s = document.createElement('div'); s.className = 'snowflake'; s.innerText = '❄'; s.style.left = Math.random() * 100 + '%'; s.style.fontSize = Math.random() * 10 + 10 + 'px'; s.style.animationDuration = Math.random() * 3 + 2 + 's'; document.getElementById('snow').appendChild(s); setTimeout(() => s.remove(), 5000); }
         window.onload = start;
     </script>
